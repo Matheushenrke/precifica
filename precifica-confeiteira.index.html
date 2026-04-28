@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1C0A00">
+<title>Precifica — Delícia em Bolo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ====================================================
+   VARIÁVEIS & BASE
+   ==================================================== */
+:root {
+  --c: #C8651A;        /* caramelo */
+  --cl: #E8832A;       /* caramelo light */
+  --cd: #8B3E0A;       /* caramelo deep */
+  --cre: #FDF6EC;      /* creme */
+  --cre2: #F5E8D0;     /* creme2 */
+  --cre3: #E0C99A;     /* creme3 */
+  --bolo: #1C0A00;     /* bolo escuro */
+  --bolo2: #4A1E08;    /* bolo2 */
+  --bolo3: #7A3818;    /* bolo3 text */
+  --vd: #1A6035;       /* verde */
+  --vd-bg: #D0EDD8;    /* verde bg */
+  --vm: #A81C1C;       /* vermelho */
+  --vm-bg: #FCDCDC;    /* vermelho bg */
+  --au: #8A6000;       /* âmbar/ouro */
+  --au-bg: #FFF2C0;    /* âmbar bg */
+  --br: #FFFFFF;
+  --r: 18px;
+  --r-sm: 10px;
+  --sh: 0 2px 16px rgba(28,10,0,0.10);
+  --sh-lg: 0 8px 32px rgba(28,10,0,0.16);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{font-size:16px;height:100%}
+body{font-family:'Nunito',sans-serif;background:var(--cre);color:var(--bolo);min-height:100%;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+button{font-family:'Nunito',sans-serif;cursor:pointer}
+input,select{font-family:'Nunito',sans-serif}
+
+/* ====================================================
+   CAMADAS (layer system)
+   ==================================================== */
+.layer{display:none;position:fixed;inset:0;z-index:10;background:var(--cre);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.layer.vis{display:block}
+
+/* ====================================================
+   TOPBAR
+   ==================================================== */
+.topbar{
+  background:var(--bolo);padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:99;
+  box-shadow:0 2px 16px rgba(0,0,0,0.35);
+}
+.logo{font-family:'Fraunces',serif;font-size:20px;font-weight:900;color:var(--cre);letter-spacing:-0.02em}
+.logo em{color:var(--cl);font-style:italic}
+.logo-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--cre3);letter-spacing:0.1em;opacity:0.65;margin-top:2px}
+.topbar-right{display:flex;gap:10px;align-items:center}
+.icon-btn{background:rgba(255,255,255,0.08);border:none;color:var(--cre3);width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background 0.2s}
+.icon-btn:hover{background:rgba(255,255,255,0.15)}
+
+/* ====================================================
+   BOTTOM NAV
+   ==================================================== */
+.bottomnav{
+  position:fixed;bottom:0;left:0;right:0;z-index:90;
+  background:var(--bolo);border-top:1px solid rgba(255,255,255,0.08);
+  display:flex;padding:8px 0 20px;
+  box-shadow:0 -4px 24px rgba(0,0,0,0.3);
+}
+.bnav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:none;border:none;color:rgba(255,255,255,0.4);
+  font-size:11px;font-weight:700;padding:6px 4px;
+  transition:color 0.2s;letter-spacing:0.02em;
+}
+.bnav-btn .ni{font-size:20px;display:block}
+.bnav-btn.ativo{color:var(--cl)}
+.bnav-btn.ativo .ni{filter:drop-shadow(0 0 6px rgba(232,131,42,0.5))}
+
+/* ====================================================
+   STEPS BAR
+   ==================================================== */
+.steps{background:var(--bolo2);padding:10px 20px;display:flex;gap:6px;align-items:center;justify-content:center}
+.sdot{width:28px;height:4px;border-radius:2px;background:rgba(255,255,255,0.14);transition:background 0.3s}
+.sdot.ativo{background:var(--cl)}
+.sdot.feito{background:#3DBE7A}
+.slbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--cre3);margin-left:8px;letter-spacing:0.08em;opacity:0.7}
+
+/* ====================================================
+   CONTEÚDO DAS ABAS
+   ==================================================== */
+.aba{display:none;padding:24px 20px 110px}
+.aba.vis{display:block;animation:subir 0.28s ease}
+@keyframes subir{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ====================================================
+   TIPOGRAFIA UTILITÁRIA
+   ==================================================== */
+.tag-mono{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--c);display:block;margin-bottom:6px}
+.titulo{font-family:'Fraunces',serif;font-size:26px;font-weight:900;color:var(--bolo);line-height:1.18;margin-bottom:12px}
+.titulo em{color:var(--c);font-style:italic}
+.subtexto{font-size:14px;color:var(--bolo3);line-height:1.65;margin-bottom:18px}
+
+/* ====================================================
+   CARDS / PANELS
+   ==================================================== */
+.card{background:var(--br);border:1.5px solid var(--cre3);border-radius:var(--r);padding:18px;box-shadow:var(--sh)}
+.info-box{background:var(--cre2);border:1.5px solid var(--cre3);border-left:4px solid var(--c);border-radius:var(--r-sm);padding:13px 15px;font-size:13px;color:var(--bolo3);line-height:1.6;margin-bottom:18px}
+.info-box strong{color:var(--bolo)}
+.divider{border:none;border-top:1px dashed var(--cre3);margin:20px 0}
+
+/* ====================================================
+   CAMPOS DE FORMULÁRIO
+   ==================================================== */
+.campo{margin-bottom:15px}
+.campo-label{font-size:13px;font-weight:800;color:var(--bolo);display:block;margin-bottom:5px}
+.campo-hint{font-size:11px;color:var(--bolo3);opacity:0.55;margin-top:4px;display:block;line-height:1.5}
+input[type="text"],input[type="number"],input[type="password"],select{
+  width:100%;background:var(--br);border:2px solid var(--cre3);
+  border-radius:var(--r-sm);padding:13px 14px;
+  font-family:'Nunito',sans-serif;font-size:16px;color:var(--bolo);
+  outline:none;transition:border-color 0.2s,box-shadow 0.2s;
+  -webkit-appearance:none;appearance:none;
+}
+input:focus,select:focus{border-color:var(--c);box-shadow:0 0 0 3px rgba(200,101,26,0.14)}
+input::placeholder{color:#C4A870;font-weight:400}
+
+/* Sugestões autocomplete */
+.sugestoes{
+  position:absolute;left:0;right:0;top:100%;
+  background:var(--br);border:2px solid var(--c);border-top:none;
+  border-radius:0 0 var(--r-sm) var(--r-sm);z-index:50;
+  max-height:160px;overflow-y:auto;box-shadow:var(--sh-lg);
+}
+.sug-item{padding:11px 14px;font-size:14px;font-weight:600;color:var(--bolo);cursor:pointer;border-bottom:1px solid var(--cre3);transition:background 0.15s}
+.sug-item:last-child{border-bottom:none}
+.sug-item:hover{background:var(--cre2)}
+.sug-item small{display:block;font-size:11px;color:var(--bolo3);opacity:0.6;margin-top:1px;font-weight:400}
+.campo-wrap{position:relative}
+
+/* ====================================================
+   BOTÕES
+   ==================================================== */
+.btn-p{width:100%;background:linear-gradient(135deg,var(--cl),var(--c));color:var(--br);border:none;border-radius:var(--r);padding:18px 24px;font-size:17px;font-weight:800;box-shadow:0 5px 20px rgba(200,101,26,0.38);transition:all 0.22s;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:0.01em}
+.btn-p:active{transform:scale(0.97);opacity:0.9}
+.btn-s{width:100%;background:var(--br);color:var(--c);border:2px solid var(--c);border-radius:var(--r);padding:15px 24px;font-size:16px;font-weight:800;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-s:active{background:var(--cre2)}
+.btn-g{background:none;border:none;color:var(--bolo3);opacity:0.5;font-size:14px;font-weight:700;padding:12px;text-align:center;width:100%;text-decoration:underline}
+.btn-sm{background:var(--cre2);border:1.5px solid var(--cre3);border-radius:8px;padding:7px 13px;font-size:12px;font-weight:800;color:var(--bolo2);display:inline-flex;align-items:center;gap:5px;transition:all 0.15s}
+.btn-sm:hover{border-color:var(--c);color:var(--c)}
+.btn-sm.danger{background:var(--vm-bg);border-color:var(--vm);color:var(--vm)}
+.btn-row{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+
+/* ====================================================
+   INGREDIENTES
+   ==================================================== */
+.ing-lista{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.ing-row{background:var(--br);border:2px solid var(--cre3);border-radius:var(--r);padding:14px;transition:border-color 0.2s}
+.ing-row:focus-within{border-color:var(--cl)}
+.ing-cabecalho{display:flex;gap:8px;align-items:center;margin-bottom:11px}
+.ing-nome-inp{flex:1;background:var(--cre);border:1.5px solid var(--cre3);border-radius:8px;padding:10px 12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--bolo);outline:none;transition:border-color 0.2s}
+.ing-nome-inp:focus{border-color:var(--c);background:var(--br)}
+.ing-nome-inp::placeholder{color:#C4A870;font-weight:400}
+.btn-del{width:34px;height:34px;border-radius:8px;border:none;background:var(--vm-bg);color:var(--vm);font-size:16px;font-weight:800;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background 0.2s}
+.btn-del:hover{background:#f5b8b8}
+.ing-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.ing-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mini-lbl{font-size:10px;font-weight:800;color:var(--bolo3);display:block;margin-bottom:4px;letter-spacing:0.04em;opacity:0.7}
+.mini-inp{width:100%;background:var(--cre);border:1.5px solid var(--cre3);border-radius:8px;padding:9px 10px;font-family:'DM Mono',monospace;font-size:13px;color:var(--bolo);outline:none;text-align:right;-webkit-appearance:none;appearance:none;transition:border-color 0.2s}
+.mini-inp:focus{border-color:var(--c);background:var(--br)}
+.mini-sel{width:100%;background:var(--cre);border:1.5px solid var(--cre3);border-radius:8px;padding:9px 8px;font-family:'Nunito',sans-serif;font-size:12px;color:var(--bolo);outline:none;-webkit-appearance:none;appearance:none;transition:border-color 0.2s}
+.mini-sel:focus{border-color:var(--c)}
+.ing-sub{background:var(--vd-bg);border:1.5px solid #9EDCB0;border-radius:8px;padding:9px 12px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--vd);text-align:right}
+.btn-add{width:100%;border:2px dashed var(--cl);background:rgba(232,131,42,0.05);border-radius:var(--r-sm);padding:14px;font-size:14px;font-weight:800;color:var(--c);display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.2s}
+.btn-add:hover{background:rgba(232,131,42,0.11)}
+
+/* ====================================================
+   CUSTOS
+   ==================================================== */
+.custos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.custo-card{background:var(--br);border:1.5px solid var(--cre3);border-radius:var(--r);padding:14px}
+.custo-card:focus-within{border-color:var(--c)}
+.custo-emoji{font-size:22px;display:block;margin-bottom:5px}
+.custo-titulo{font-size:12px;font-weight:800;color:var(--bolo);display:block;margin-bottom:8px;line-height:1.3}
+.custo-inp{width:100%;background:var(--cre);border:1.5px solid var(--cre3);border-radius:8px;padding:8px 10px;font-family:'DM Mono',monospace;font-size:14px;color:var(--bolo);outline:none;text-align:right;-webkit-appearance:none;appearance:none;transition:border-color 0.2s}
+.custo-inp:focus{border-color:var(--c);background:var(--br)}
+.custo-hint{font-size:10px;color:var(--bolo3);opacity:0.45;margin-top:4px;display:block}
+
+/* MARGEM */
+.margem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.btn-m{border:2px solid var(--cre3);background:var(--br);border-radius:var(--r-sm);padding:11px 6px;font-size:14px;font-weight:800;color:var(--bolo3);text-align:center;transition:all 0.2s}
+.btn-m span{display:block;font-size:10px;font-weight:600;color:var(--bolo3);opacity:0.55;margin-top:2px}
+.btn-m.sel{border-color:var(--c);background:var(--c);color:var(--br)}
+.btn-m.sel span{color:rgba(255,255,255,0.8);opacity:1}
+.margem-row{display:flex;align-items:center;gap:10px}
+.margem-inp{flex:1;background:var(--br);border:2px solid var(--cre3);border-radius:var(--r-sm);padding:12px 14px;font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--bolo);outline:none;text-align:center;-webkit-appearance:none;appearance:none;transition:border-color 0.2s}
+.margem-inp:focus{border-color:var(--c)}
+.margem-pct{font-size:20px;font-weight:900;color:var(--c);flex-shrink:0}
+
+/* ====================================================
+   RESULTADO
+   ==================================================== */
+.res-hero{background:var(--bolo);border-radius:var(--r);padding:28px 22px;text-align:center;margin-bottom:14px;position:relative;overflow:hidden}
+.res-hero::after{content:'🎂';position:absolute;font-size:110px;opacity:0.055;right:-10px;bottom:-20px;pointer-events:none}
+.res-lbl{font-family:'DM Mono',monospace;font-size:9px;color:#C0966A;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:4px}
+.res-prod{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--cre);font-style:italic;margin-bottom:18px;line-height:1.2}
+.res-preco-lbl{font-size:10px;color:#C0966A;margin-bottom:5px;letter-spacing:0.08em;text-transform:uppercase}
+.res-preco{font-family:'Fraunces',serif;font-size:58px;font-weight:900;color:var(--cl);line-height:1;margin-bottom:5px}
+.res-render{font-size:13px;color:#C0966A;margin-bottom:12px}
+.verdict{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:100px;font-size:13px;font-weight:800}
+.verdict.ok{background:rgba(61,190,122,0.18);color:#80FFB8}
+.verdict.av{background:rgba(212,160,23,0.2);color:#FFD870}
+.verdict.ruim{background:rgba(192,57,43,0.2);color:#FF9090}
+
+.res-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.res-card{background:var(--br);border:1.5px solid var(--cre3);border-radius:var(--r-sm);padding:14px}
+.res-card.full{grid-column:1/-1}
+.rc-lbl{font-size:10px;font-weight:800;color:var(--bolo3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px}
+.rc-val{font-family:'Fraunces',serif;font-size:24px;font-weight:700;color:var(--bolo)}
+.rc-val.vd{color:var(--vd)}
+.rc-val.au{color:var(--au)}
+.rc-sub{font-size:11px;color:var(--bolo3);opacity:0.4;margin-top:2px}
+
+.breakdown{background:var(--br);border:1.5px solid var(--cre3);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
+.bd-titulo{background:var(--cre2);padding:11px 16px;font-size:10px;font-weight:800;color:var(--bolo3);letter-spacing:0.1em;text-transform:uppercase;border-bottom:1px solid var(--cre3)}
+.bd-row{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--cre3);font-size:14px}
+.bd-row:last-child{border-bottom:none}
+.bd-row.tot{background:var(--cre2);font-weight:800}
+.bd-row.lucro{background:var(--vd-bg);font-weight:800;font-size:15px;color:var(--vd)}
+.bd-nome{color:var(--bolo3)}
+.bd-val{font-family:'DM Mono',monospace;font-weight:500;color:var(--bolo)}
+.bd-val.vd{color:var(--vd)}
+
+.alerta{border-radius:var(--r-sm);padding:13px 15px;font-size:13px;line-height:1.6;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start}
+.alerta.ok{background:var(--vd-bg);border:1.5px solid #9EDCB0;color:#175030}
+.alerta.av{background:var(--au-bg);border:1.5px solid #D4A828;color:#5A3E00}
+.alerta.ruim{background:var(--vm-bg);border:1.5px solid #D08080;color:#6A1818}
+.alerta strong{display:block;font-size:14px;margin-bottom:2px}
+.al-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+
+/* ====================================================
+   HISTÓRICO
+   ==================================================== */
+.hist-lista{display:flex;flex-direction:column;gap:10px}
+.hist-card{background:var(--br);border:1.5px solid var(--cre3);border-radius:var(--r);padding:16px;transition:border-color 0.2s}
+.hist-card:hover{border-color:var(--cl)}
+.hist-topo{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.hist-nome{font-weight:800;font-size:15px;color:var(--bolo)}
+.hist-preco{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--c)}
+.hist-data{font-size:11px;color:var(--bolo3);opacity:0.5;margin-top:2px}
+.hist-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.htag{font-size:11px;font-weight:700;font-family:'DM Mono',monospace;padding:3px 9px;border-radius:100px}
+.htag.v{background:var(--vd-bg);color:var(--vd)}
+.htag.r{background:var(--vm-bg);color:var(--vm)}
+.htag.a{background:var(--au-bg);color:var(--au)}
+.hist-actions{display:flex;gap:8px}
+.empty{text-align:center;padding:52px 20px}
+.empty .ei{font-size:52px;margin-bottom:14px;display:block}
+.empty p{font-size:14px;color:var(--bolo3);opacity:0.45;line-height:1.6}
+
+/* ====================================================
+   TABS
+   ==================================================== */
+.tabs{display:flex;background:var(--cre2);border:1.5px solid var(--cre3);border-radius:var(--r-sm);padding:4px;gap:4px;margin-bottom:20px}
+.tab{flex:1;padding:10px 8px;border:none;background:none;border-radius:8px;font-size:13px;font-weight:700;color:var(--bolo3);transition:all 0.2s}
+.tab.ativo{background:var(--br);color:var(--c);box-shadow:var(--sh)}
+
+/* ====================================================
+   ESTOQUE
+   ==================================================== */
+.estoque-item{background:var(--br);border:1.5px solid var(--cre3);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.est-info{flex:1}
+.est-nome{font-weight:800;font-size:14px;color:var(--bolo)}
+.est-detalhe{font-size:12px;color:var(--bolo3);opacity:0.55;margin-top:2px;font-family:'DM Mono',monospace}
+.est-preco{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--c);flex-shrink:0}
+
+/* ====================================================
+   SOBRE (PERFIL DANI)
+   ==================================================== */
+.sobre-hero{background:linear-gradient(160deg,var(--bolo) 0%,var(--bolo2) 100%);padding:40px 20px 32px;text-align:center;margin:-24px -20px 24px;position:relative;overflow:hidden}
+.sobre-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(232,131,42,0.15),transparent 60%)}
+.sobre-avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--cl),var(--cd));margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:44px;border:3px solid rgba(232,131,42,0.4);position:relative;z-index:1}
+.sobre-nome{font-family:'Fraunces',serif;font-size:24px;font-weight:900;color:var(--cre);font-style:italic;margin-bottom:4px;position:relative;z-index:1}
+.sobre-cidade{font-family:'DM Mono',monospace;font-size:11px;color:var(--cre3);letter-spacing:0.1em;opacity:0.7;position:relative;z-index:1}
+.sobre-bio{font-size:15px;color:var(--bolo3);line-height:1.7;margin-bottom:20px}
+.sobre-bio strong{color:var(--bolo)}
+.social-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.social-btn{background:var(--br);border:1.5px solid var(--cre3);border-radius:var(--r);padding:16px;text-align:center;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:6px;transition:border-color 0.2s;color:var(--bolo)}
+.social-btn:hover{border-color:var(--c)}
+.social-btn .si{font-size:28px}
+.social-btn .sn{font-size:13px;font-weight:800;color:var(--bolo)}
+.social-btn .sh{font-size:11px;color:var(--bolo3);opacity:0.5}
+.curso-card{background:linear-gradient(135deg,var(--c),var(--cd));border-radius:var(--r);padding:24px 20px;text-align:center;color:var(--br);margin-bottom:20px;position:relative;overflow:hidden}
+.curso-card::after{content:'🎂';position:absolute;font-size:80px;opacity:0.1;right:-10px;bottom:-10px}
+.curso-titulo{font-family:'Fraunces',serif;font-size:20px;font-weight:900;font-style:italic;margin-bottom:8px}
+.curso-desc{font-size:13px;opacity:0.85;line-height:1.6;margin-bottom:18px}
+.btn-curso{background:var(--br);color:var(--c);border:none;border-radius:100px;padding:14px 28px;font-size:15px;font-weight:800;display:inline-block;text-decoration:none;box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+
+/* ====================================================
+   ADMIN PANEL
+   ==================================================== */
+.admin-header{background:var(--bolo);border-radius:var(--r);padding:20px;margin-bottom:16px;display:flex;align-items:center;gap:14px}
+.admin-icon{font-size:32px}
+.admin-titulo{font-family:'Fraunces',serif;font-size:20px;font-weight:900;color:var(--cre);font-style:italic}
+.admin-sub{font-size:12px;color:var(--cre3);opacity:0.6;margin-top:2px;font-family:'DM Mono',monospace}
+.token-item{background:var(--br);border:1.5px solid var(--cre3);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.token-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--c);font-weight:700;background:var(--cre2);padding:4px 8px;border-radius:6px;flex-shrink:0;min-width:44px;text-align:center}
+.token-info{flex:1}
+.token-code{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--bolo);letter-spacing:0.05em}
+.token-nome{font-size:12px;color:var(--bolo3);opacity:0.55;margin-top:2px}
+.token-data{font-size:10px;color:var(--bolo3);opacity:0.35;margin-top:1px}
+.token-badge{font-size:10px;font-weight:700;font-family:'DM Mono',monospace;padding:3px 8px;border-radius:100px;flex-shrink:0}
+.token-badge.admin{background:rgba(200,101,26,0.15);color:var(--c)}
+.token-badge.ativo{background:var(--vd-bg);color:var(--vd)}
+.token-badge.revogado{background:var(--vm-bg);color:var(--vm)}
+
+/* ====================================================
+   TOUR / ONBOARDING
+   ==================================================== */
+.tour-overlay{position:fixed;inset:0;z-index:200;background:rgba(28,10,0,0.96);display:none;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:40px}
+.tour-overlay.vis{display:flex;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.tour-content{width:100%;max-width:420px;padding:0 24px;text-align:center}
+.tour-slide{display:none}
+.tour-slide.ativo{display:block;animation:subir 0.35s ease}
+.tour-emoji{font-size:72px;margin-bottom:20px;display:block;animation:flut 2.5s ease-in-out infinite}
+@keyframes flut{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.tour-titulo{font-family:'Fraunces',serif;font-size:30px;font-weight:900;color:var(--cre);line-height:1.15;margin-bottom:14px}
+.tour-titulo em{color:var(--cl);font-style:italic}
+.tour-texto{font-size:16px;color:var(--cre2);line-height:1.7;margin-bottom:32px;opacity:0.85}
+.tour-dots{display:flex;gap:6px;justify-content:center;margin-bottom:28px}
+.tour-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all 0.3s}
+.tour-dot.ativo{background:var(--cl);width:24px;border-radius:4px}
+.tour-prog{width:100%;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;margin-bottom:20px;overflow:hidden}
+.tour-prog-fill{height:100%;background:var(--cl);border-radius:2px;transition:width 0.4s ease}
+
+/* ====================================================
+   TELA DE ACESSO
+   ==================================================== */
+.acesso-layer{position:fixed;inset:0;z-index:300;background:var(--bolo);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px}
+.acesso-layer.oculto{display:none}
+.acesso-logo{font-family:'Fraunces',serif;font-size:36px;font-weight:900;color:var(--cre);text-align:center;margin-bottom:6px}
+.acesso-logo em{color:var(--cl);font-style:italic}
+.acesso-sub{font-family:'DM Mono',monospace;font-size:11px;color:var(--cre3);letter-spacing:0.1em;opacity:0.55;text-align:center;margin-bottom:40px}
+.acesso-emoji{font-size:64px;text-align:center;display:block;margin-bottom:24px;animation:flut 2.5s ease-in-out infinite}
+.acesso-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:var(--r);padding:28px 24px;width:100%;max-width:380px;margin-bottom:20px}
+.acesso-card h2{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--cre);font-style:italic;margin-bottom:6px}
+.acesso-card p{font-size:13px;color:var(--cre3);opacity:0.6;margin-bottom:20px;line-height:1.6}
+.acesso-card input{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.12);color:var(--cre);border-radius:var(--r-sm);padding:14px 16px;font-family:'DM Mono',monospace;font-size:16px;letter-spacing:0.08em;text-align:center;text-transform:uppercase}
+.acesso-card input::placeholder{color:rgba(255,255,255,0.25);font-size:13px;letter-spacing:0;text-transform:none}
+.acesso-card input:focus{border-color:var(--cl);box-shadow:0 0 0 3px rgba(232,131,42,0.2)}
+.acesso-erro{color:#FF9090;font-size:13px;text-align:center;margin-top:10px;min-height:20px;font-weight:700}
+.acesso-rodape{font-size:12px;color:rgba(255,255,255,0.2);text-align:center;margin-top:20px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     TELA DE ACESSO
+     ============================================================ -->
+<div class="acesso-layer" id="acesso-layer">
+  <span class="acesso-emoji">🎂</span>
+  <div class="acesso-logo">Precifica <em>by Dani</em></div>
+  <div class="acesso-sub">DELÍCIA EM BOLO · FERRAMENTA EXCLUSIVA</div>
+
+  <div class="acesso-card">
+    <h2>Bem-vinda, confeiteira!</h2>
+    <p>Você recebeu um código de acesso exclusivo junto com a sua compra. Digite ele aqui embaixo pra entrar.</p>
+    <input type="text" id="inp-token" placeholder="Ex: 001-ABC" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="this.value=this.value.toUpperCase()">
+    <div class="acesso-erro" id="acesso-erro"></div>
+    <div style="margin-top:16px;">
+      <button class="btn-p" onclick="verificarToken()">Entrar →</button>
+    </div>
+  </div>
+
+  <div class="acesso-rodape">
+    Ferramenta exclusiva para alunas do curso<br>Bolos Caseiros Lucrativos · Daniella Rodrigues
+  </div>
+</div>
+
+<!-- ============================================================
+     TOUR ONBOARDING
+     ============================================================ -->
+<div class="tour-overlay" id="tour">
+  <div class="tour-prog"><div class="tour-prog-fill" id="tour-prog-fill" style="width:20%"></div></div>
+  <div class="tour-content">
+    <!-- Slide 0 -->
+    <div class="tour-slide ativo" id="ts0">
+      <span class="tour-emoji">🎂</span>
+      <h2 class="tour-titulo">Bem-vinda ao <em>Precifica!</em></h2>
+      <p class="tour-texto">Aqui você descobre o preço certo dos seus bolos — sem planilha complicada, sem matemática difícil. É tudo simples, do jeitinho que você merece.</p>
+    </div>
+    <!-- Slide 1 -->
+    <div class="tour-slide" id="ts1">
+      <span class="tour-emoji">🧮</span>
+      <h2 class="tour-titulo">Calcule <em>de verdade</em></h2>
+      <p class="tour-texto">Coloca os ingredientes com o preço que você pagou no mercado. O app faz toda a conta do custo por grama, por porção — tudo automático pra você.</p>
+    </div>
+    <!-- Slide 2 -->
+    <div class="tour-slide" id="ts2">
+      <span class="tour-emoji">💡</span>
+      <h2 class="tour-titulo">Não esqueça os <em>custos fixos</em></h2>
+      <p class="tour-texto">Energia, gás, embalagem... tudo isso sai do seu bolso! A gente inclui tudo no cálculo pra você não sair no prejuízo sem perceber.</p>
+    </div>
+    <!-- Slide 3 -->
+    <div class="tour-slide" id="ts3">
+      <span class="tour-emoji">📋</span>
+      <h2 class="tour-titulo">Seu <em>estoque</em> inteligente</h2>
+      <p class="tour-texto">Cadastra seus ingredientes uma vez só. Na hora de criar uma receita nova, é só digitar o nome e já aparece tudo preenchido automaticamente!</p>
+    </div>
+    <!-- Slide 4 -->
+    <div class="tour-slide" id="ts4">
+      <span class="tour-emoji">🏆</span>
+      <h2 class="tour-titulo">Pronta pra <em>lucrar?</em></h2>
+      <p class="tour-texto">Você vai ver o preço certo, o lucro por bolo, e quanto vai faturar vendendo o lote todo. Nada de chutar preço, sua confeitaria merece ser lucrativa!</p>
+    </div>
+
+    <div class="tour-dots" id="tour-dots">
+      <div class="tour-dot ativo"></div>
+      <div class="tour-dot"></div>
+      <div class="tour-dot"></div>
+      <div class="tour-dot"></div>
+      <div class="tour-dot"></div>
+    </div>
+
+    <button class="btn-p" id="tour-btn" onclick="tourNext()" style="max-width:320px;margin:0 auto">Próximo →</button>
+    <br>
+    <button class="btn-g" onclick="fecharTour()" style="color:rgba(255,255,255,0.3)">Pular introdução</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     APP PRINCIPAL
+     ============================================================ -->
+<div id="app" style="display:none;">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div>
+      <div class="logo">Precifica <em>🎂</em></div>
+      <div class="logo-sub">DELÍCIA EM BOLO</div>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" id="btn-admin-top" onclick="abrirAdmin()" style="display:none;" title="Admin">⚙️</button>
+      <button class="icon-btn" onclick="irAba('sobre')" title="Sobre a Dani">👩‍🍳</button>
+    </div>
+  </div>
+
+  <!-- STEPS BAR (só aparece no fluxo) -->
+  <div class="steps" id="steps-bar" style="display:none;">
+    <div class="sdot" id="d0"></div>
+    <div class="sdot" id="d1"></div>
+    <div class="sdot" id="d2"></div>
+    <div class="sdot" id="d3"></div>
+    <div class="sdot" id="d4"></div>
+    <span class="slbl" id="slbl">início</span>
+  </div>
+
+  <!-- =================== ABA: HOME =================== -->
+  <div class="aba vis" id="aba-home">
+    <span class="tour-emoji" style="font-size:60px;display:block;text-align:center;margin-bottom:16px;animation:flut 2.5s ease-in-out infinite">🎂</span>
+    <h1 class="titulo" style="text-align:center;font-size:30px;">Sua receita vale<br><em>quanto ela merece</em></h1>
+    <p class="subtexto" style="text-align:center;">Calcule o preço certo dos seus bolos em minutos — direto no celular, sem complicação.</p>
+
+    <button class="btn-p" onclick="iniciarCalculo()" style="margin-bottom:16px;">✨ Calcular preço de um bolo</button>
+
+    <div class="tabs">
+      <button class="tab ativo" id="tab-hist-btn" onclick="mudarTab('hist',this)">📋 Receitas salvas</button>
+      <button class="tab" id="tab-est-btn" onclick="mudarTab('est',this)">🥚 Meu estoque</button>
+    </div>
+
+    <div id="tab-hist">
+      <div class="hist-lista" id="hist-lista"></div>
+    </div>
+    <div id="tab-est" style="display:none;">
+      <div class="info-box">💡 <strong>Estoque inteligente:</strong> cadastre seus ingredientes com o preço de mercado. Quando criar uma nova receita, eles aparecem automaticamente como sugestão.</div>
+      <div id="estoque-lista"></div>
+      <button class="btn-s" onclick="abrirAddEstoque()" style="margin-top:4px;">+ Adicionar ingrediente ao estoque</button>
+    </div>
+  </div>
+
+  <!-- =================== FLUXO CALCULAR =================== -->
+
+  <!-- STEP 1: NOME -->
+  <div class="aba" id="aba-s1">
+    <span class="tag-mono">Passo 1 de 4</span>
+    <h2 class="titulo">Qual bolo você quer precificar?</h2>
+    <div class="campo">
+      <label class="campo-label" for="inp-nome">Nome da receita</label>
+      <input type="text" id="inp-nome" placeholder="Ex: Bolo de Milho Gourmet" autocomplete="off">
+      <span class="campo-hint">Use um nome que você vai lembrar depois 😊</span>
+    </div>
+    <div class="campo">
+      <label class="campo-label" for="inp-rend">Quantas unidades essa receita rende?</label>
+      <input type="number" id="inp-rend" placeholder="1" min="1" value="1" inputmode="decimal">
+      <span class="campo-hint">Se rende 1 bolo inteiro, coloque 1. Se rende fatias, coloque a quantidade total</span>
+    </div>
+    <div class="campo">
+      <label class="campo-label" for="inp-tipo">Tipo de unidade</label>
+      <select id="inp-tipo">
+        <option value="bolo">Bolo inteiro</option>
+        <option value="fatia">Fatia</option>
+        <option value="pote">Pote / Porção</option>
+        <option value="unidade">Unidade</option>
+        <option value="kg">Quilograma (kg)</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn-p" onclick="validarS1()">Próximo: ingredientes →</button>
+      <button class="btn-g" onclick="irAba('home')">← Voltar</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: INGREDIENTES -->
+  <div class="aba" id="aba-s2">
+    <span class="tag-mono">Passo 2 de 4 — Ingredientes</span>
+    <h2 class="titulo" id="titulo-s2">Ingredientes do bolo</h2>
+    <div class="info-box"><strong>📌 Como preencher:</strong> coloque o preço do pacote completo, o tamanho do pacote e quanto você usa nessa receita. O cálculo é automático!</div>
+    <div class="ing-lista" id="ing-lista"></div>
+    <button class="btn-add" onclick="addIng()"><span style="font-size:20px;">+</span> Adicionar ingrediente</button>
+    <div class="btn-row">
+      <button class="btn-p" onclick="irAba('s3')">Próximo: custos fixos →</button>
+      <button class="btn-g" onclick="irAba('s1')">← Voltar</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: CUSTOS + MARGEM -->
+  <div class="aba" id="aba-s3">
+    <span class="tag-mono">Passo 3 de 4 — Custos fixos</span>
+    <h2 class="titulo">Outros custos da receita</h2>
+    <div class="info-box"><strong>💡 Por que isso importa?</strong> Muita confeiteira só conta os ingredientes e fica no prejuízo. Energia, gás e embalagem saem do seu bolso também!</div>
+    <div class="custos-grid">
+      <div class="custo-card"><span class="custo-emoji">⚡</span><span class="custo-titulo">Energia elétrica</span><input type="number" class="custo-inp" id="c-energia" min="0" step="0.01" value="3" inputmode="decimal"><span class="custo-hint">R$ por uso / fornada</span></div>
+      <div class="custo-card"><span class="custo-emoji">🔥</span><span class="custo-titulo">Gás de cozinha</span><input type="number" class="custo-inp" id="c-gas" min="0" step="0.01" value="2" inputmode="decimal"><span class="custo-hint">R$ por uso estimado</span></div>
+      <div class="custo-card"><span class="custo-emoji">📦</span><span class="custo-titulo">Embalagem</span><input type="number" class="custo-inp" id="c-embalagem" min="0" step="0.01" value="3" inputmode="decimal"><span class="custo-hint">R$ por unidade</span></div>
+      <div class="custo-card"><span class="custo-emoji">🚗</span><span class="custo-titulo">Entrega / frete</span><input type="number" class="custo-inp" id="c-entrega" min="0" step="0.01" value="0" inputmode="decimal"><span class="custo-hint">R$ médio por entrega</span></div>
+      <div class="custo-card"><span class="custo-emoji">👩‍🍳</span><span class="custo-titulo">Sua mão de obra</span><input type="number" class="custo-inp" id="c-maodeobra" min="0" step="0.01" value="0" inputmode="decimal"><span class="custo-hint">R$ pelo seu tempo</span></div>
+      <div class="custo-card"><span class="custo-emoji">➕</span><span class="custo-titulo">Outros custos</span><input type="number" class="custo-inp" id="c-outros" min="0" step="0.01" value="0" inputmode="decimal"><span class="custo-hint">Taxas, plataforma…</span></div>
+    </div>
+    <div class="divider"></div>
+    <span class="tag-mono">Margem de lucro</span>
+    <p class="subtexto" style="margin-bottom:14px;">Quanto você quer lucrar em cima do custo total?</p>
+    <div class="margem-grid">
+      <button class="btn-m sel" id="m30" onclick="selM(30,this)">30%<span>Mínimo</span></button>
+      <button class="btn-m" id="m50" onclick="selM(50,this)">50%<span>Saudável</span></button>
+      <button class="btn-m" id="m80" onclick="selM(80,this)">80%<span>Premium</span></button>
+      <button class="btn-m" id="m100" onclick="selM(100,this)">100%<span>Dobro</span></button>
+    </div>
+    <div class="margem-row">
+      <input type="number" class="margem-inp" id="m-custom" placeholder="ou digite aqui" min="1" max="9999" inputmode="decimal" oninput="mCustom()">
+      <span class="margem-pct">%</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn-p" onclick="calcular()">🧮 Ver resultado →</button>
+      <button class="btn-g" onclick="irAba('s2')">← Voltar</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: RESULTADO -->
+  <div class="aba" id="aba-s4">
+    <div class="res-hero">
+      <div class="res-lbl">SUA RECEITA</div>
+      <div class="res-prod" id="r-prod">—</div>
+      <div class="res-preco-lbl">PREÇO SUGERIDO POR <span id="r-tipo-lbl">BOLO</span></div>
+      <div class="res-preco" id="r-preco">R$ 0,00</div>
+      <div class="res-render" id="r-render">1 bolo</div>
+      <div class="verdict ok" id="r-verdict">🏆 Excelente!</div>
+    </div>
+
+    <div class="res-cards">
+      <div class="res-card"><div class="rc-lbl">Custo ingredientes</div><div class="rc-val" id="r-c-ing">R$ 0,00</div><div class="rc-sub">por unidade</div></div>
+      <div class="res-card"><div class="rc-lbl">Custos fixos</div><div class="rc-val" id="r-c-fix">R$ 0,00</div><div class="rc-sub">por unidade</div></div>
+      <div class="res-card"><div class="rc-lbl">Custo total</div><div class="rc-val" id="r-c-tot">R$ 0,00</div><div class="rc-sub">por unidade</div></div>
+      <div class="res-card"><div class="rc-lbl">Lucro líquido</div><div class="rc-val vd" id="r-lucro">R$ 0,00</div><div class="rc-sub" id="r-m-lbl">margem</div></div>
+      <div class="res-card full"><div class="rc-lbl">💰 Faturamento total do lote</div><div class="rc-val au" id="r-fat">R$ 0,00</div><div class="rc-sub" id="r-fat-sub">se vender tudo</div></div>
+    </div>
+
+    <div class="breakdown">
+      <div class="bd-titulo">📊 Detalhamento por unidade</div>
+      <div id="bd-ings"></div>
+      <div class="bd-row tot"><span class="bd-nome">Total ingredientes</span><span class="bd-val" id="bd-tot-ing">R$ 0,00</span></div>
+      <div class="bd-row"><span class="bd-nome">⚡ Energia</span><span class="bd-val" id="bd-energia">R$ 0,00</span></div>
+      <div class="bd-row"><span class="bd-nome">🔥 Gás</span><span class="bd-val" id="bd-gas">R$ 0,00</span></div>
+      <div class="bd-row"><span class="bd-nome">📦 Embalagem</span><span class="bd-val" id="bd-embalagem">R$ 0,00</span></div>
+      <div class="bd-row"><span class="bd-nome">🚗 Entrega</span><span class="bd-val" id="bd-entrega">R$ 0,00</span></div>
+      <div class="bd-row"><span class="bd-nome">👩‍🍳 Mão de obra</span><span class="bd-val" id="bd-maodeobra">R$ 0,00</span></div>
+      <div class="bd-row"><span class="bd-nome">➕ Outros</span><span class="bd-val" id="bd-outros">R$ 0,00</span></div>
+      <div class="bd-row tot"><span class="bd-nome">CUSTO TOTAL</span><span class="bd-val" id="bd-tot">R$ 0,00</span></div>
+      <div class="bd-row lucro"><span>🏆 SEU LUCRO</span><span class="bd-val vd" id="bd-lucro">R$ 0,00</span></div>
+    </div>
+
+    <div id="r-alerta"></div>
+
+    <div class="btn-row" style="margin-bottom:40px;">
+      <button class="btn-p" onclick="salvarENovo()">💾 Salvar e calcular novo bolo</button>
+      <button class="btn-s" onclick="compartilhar()">📤 Compartilhar resultado</button>
+      <button class="btn-g" onclick="irAba('s3')">← Ajustar valores</button>
+    </div>
+  </div>
+
+  <!-- =================== ABA: SOBRE =================== -->
+  <div class="aba" id="aba-sobre">
+    <div class="sobre-hero">
+      <div class="sobre-avatar">👩‍🍳</div>
+      <div class="sobre-nome">Maria Daniella</div>
+      <div class="sobre-cidade">PAULO AFONSO · BAHIA</div>
+    </div>
+
+    <p class="sobre-bio">Sou confeiteira profissional, <strong>Mestre em Confeitaria Artística</strong> e criadora do curso Bolos Caseiros Lucrativos. Comecei do zero, na cozinha de casa, sem equipamento profissional.</p>
+    <p class="sobre-bio">Hoje ensino outras mulheres a transformar sua cozinha em um negócio lucrativo — de verdade, com método, com carinho e com o passo a passo que eu queria ter tido quando comecei.</p>
+    <p class="sobre-bio" style="font-family:'Fraunces',serif;font-style:italic;color:var(--c);font-size:16px;">"Se eu consegui, você também consegue. Vem comigo!"</p>
+
+    <div class="divider"></div>
+
+    <span class="tag-mono" style="margin-bottom:14px;">Siga a Dani</span>
+    <div class="social-grid">
+      <a href="https://instagram.com/deliciaembolodani" target="_blank" class="social-btn">
+        <span class="si">📸</span>
+        <span class="sn">Instagram</span>
+        <span class="sh">@deliciaembolodani</span>
+      </a>
+      <a href="https://wa.me/55" target="_blank" class="social-btn">
+        <span class="si">💬</span>
+        <span class="sn">WhatsApp</span>
+        <span class="sh">Fale com a Dani</span>
+      </a>
+    </div>
+
+    <div class="divider"></div>
+
+    <span class="tag-mono" style="margin-bottom:14px;">Quer aprender mais?</span>
+    <div class="curso-card">
+      <div class="curso-titulo">Bolos Caseiros Lucrativos</div>
+      <div class="curso-desc">11 receitas de bolos juninos testadas e aprovadas para venda. Precificação, embalagem, estratégia de venda e muito mais.</div>
+      <a href="https://hotmart.com" target="_blank" class="btn-curso">Ver o curso →</a>
+    </div>
+
+    <div style="text-align:center;font-size:11px;color:var(--bolo3);opacity:0.35;margin-top:12px;font-family:'DM Mono',monospace;line-height:1.8;">
+      Precifica by Daniella · Delícia em Bolo<br>
+      Ferramenta exclusiva para alunas do curso<br>
+      Desenvolvido por Matheus Henrike · 2026
+    </div>
+  </div>
+
+  <!-- =================== ABA: ADMIN =================== -->
+  <div class="aba" id="aba-admin">
+    <div class="admin-header">
+      <div class="admin-icon">⚙️</div>
+      <div>
+        <div class="admin-titulo">Painel Admin</div>
+        <div class="admin-sub">GESTÃO DE ACESSOS</div>
+      </div>
+    </div>
+
+    <div class="info-box">Gerencie quem tem acesso ao app. Cada token é único e está vinculado a uma aluna. O número sequencial ajuda a identificar quem é quem.</div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <span class="tag-mono" style="margin-bottom:12px;">Gerar novo acesso</span>
+      <div class="campo">
+        <label class="campo-label" for="adm-nome-aluna">Nome da aluna</label>
+        <input type="text" id="adm-nome-aluna" placeholder="Ex: Maria Clara">
+      </div>
+      <button class="btn-p" onclick="gerarToken()">🔑 Gerar token de acesso</button>
+      <div id="adm-token-gerado" style="display:none;margin-top:16px;background:var(--cre2);border:1.5px solid var(--cre3);border-radius:var(--r-sm);padding:16px;text-align:center;">
+        <div style="font-size:11px;color:var(--bolo3);opacity:0.6;margin-bottom:6px;font-family:'DM Mono',monospace;letter-spacing:0.08em;">TOKEN GERADO</div>
+        <div id="adm-token-code" style="font-family:'DM Mono',monospace;font-size:24px;font-weight:700;color:var(--c);letter-spacing:0.1em;margin-bottom:10px;"></div>
+        <div id="adm-token-link" style="font-size:12px;color:var(--bolo3);word-break:break-all;margin-bottom:12px;"></div>
+        <button class="btn-sm" onclick="copiarToken()">📋 Copiar link de acesso</button>
+      </div>
+    </div>
+
+    <span class="tag-mono" style="margin-bottom:12px;">Acessos ativos</span>
+    <div id="adm-tokens-lista"></div>
+
+    <div class="btn-row" style="margin-top:24px;">
+      <button class="btn-g" onclick="irAba('home')">← Voltar ao app</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottomnav" id="bottomnav">
+    <button class="bnav-btn ativo" id="bnav-home" onclick="irAba('home')"><span class="ni">🏠</span>Início</button>
+    <button class="bnav-btn" id="bnav-calc" onclick="iniciarCalculo()"><span class="ni">🧮</span>Calcular</button>
+    <button class="bnav-btn" id="bnav-est" onclick="irAbaEstoque()"><span class="ni">🥚</span>Estoque</button>
+    <button class="bnav-btn" id="bnav-sobre" onclick="irAba('sobre')"><span class="ni">👩‍🍳</span>Sobre</button>
+  </nav>
+
+</div><!-- /#app -->
+
+<!-- MODAL ADD ESTOQUE -->
+<div id="modal-estoque" style="display:none;position:fixed;inset:0;z-index:150;background:rgba(28,10,0,0.85);align-items:flex-end;justify-content:center;">
+  <div style="background:var(--cre);border-radius:24px 24px 0 0;padding:28px 24px 40px;width:100%;max-width:480px;animation:subir 0.3s ease;">
+    <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:900;color:var(--bolo);margin-bottom:4px;">Adicionar ao estoque</div>
+    <div style="font-size:13px;color:var(--bolo3);margin-bottom:20px;">Cadastre o ingrediente com o preço de mercado atual</div>
+    <div class="campo"><label class="campo-label">Nome do ingrediente</label><input type="text" id="est-nome" placeholder="Ex: Farinha de trigo"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
+      <div><label class="campo-label" style="font-size:12px;">Preço do pacote</label><input type="number" id="est-preco" placeholder="0,00" min="0" step="0.01" inputmode="decimal"></div>
+      <div><label class="campo-label" style="font-size:12px;">Tamanho</label><input type="number" id="est-qtd" placeholder="0" min="0" inputmode="decimal"></div>
+      <div><label class="campo-label" style="font-size:12px;">Unidade</label>
+        <select id="est-und">
+          <option value="g">g</option><option value="ml">ml</option><option value="un">un</option><option value="kg">kg</option><option value="l">l</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn-s" style="flex:1;" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-p" style="flex:2;" onclick="salvarEstoque()">Salvar ingrediente →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIGURAÇÃO (editar aqui)
+   ============================================================ */
+var CONFIG = {
+  APP_URL: window.location.href.split('?')[0],
+  ADMIN_TOKENS: ['ADMIN-DANI', 'ADMIN-MATH'],
+  // Tokens de alunos são gerenciados via localStorage (admin gera)
+};
+
+/* ============================================================
+   ESTADO GLOBAL
+   ============================================================ */
+var ingCount = 0;
+var margemAtual = 30;
+var resultadoAtual = null;
+var editandoId = null;
+var tourSlide = 0;
+var isAdmin = false;
+
+/* ============================================================
+   STORAGE helpers
+   ============================================================ */
+function LS(k,v){if(v===undefined)try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function LSArr(k){var v=LS(k);return Array.isArray(v)?v:[]}
+function LSSet(k,v){LS(k,v)}
+
+/* ============================================================
+   TOKENS DE ACESSO
+   ============================================================ */
+function getTokens(){return LSArr('precifica_tokens')}
+function saveTokens(t){LSSet('precifica_tokens',t)}
+
+function verificarToken(){
+  var inp=document.getElementById('inp-token').value.trim().toUpperCase();
+  var erro=document.getElementById('acesso-erro');
+  if(!inp){erro.textContent='Por favor, digite seu código de acesso.';return;}
+
+  // Admin
+  if(CONFIG.ADMIN_TOKENS.indexOf(inp)>=0){
+    LSSet('precifica_token_atual',inp);
+    LSSet('precifica_is_admin',true);
+    isAdmin=true;
+    entrar();return;
+  }
+
+  // Aluna
+  var tokens=getTokens();
+  var found=tokens.find(function(t){return t.code===inp&&t.ativo});
+  if(found){
+    LSSet('precifica_token_atual',inp);
+    LSSet('precifica_is_admin',false);
+    isAdmin=false;
+    entrar();return;
+  }
+  erro.textContent='Código inválido ou não encontrado. Verifique e tente de novo.';
+  document.getElementById('inp-token').focus();
+}
+
+function entrar(){
+  document.getElementById('acesso-layer').classList.add('oculto');
+  document.getElementById('app').style.display='block';
+  if(isAdmin||LS('precifica_is_admin'))document.getElementById('btn-admin-top').style.display='flex';
+
+  // Tour
+  var jaViu=LS('precifica_tour_visto');
+  if(!jaViu){document.getElementById('tour').classList.add('vis');}
+
+  renderHist();renderEstoque();
+}
+
+function verificarSessao(){
+  var token=LS('precifica_token_atual');
+  if(!token){return false;}
+  // Admin sempre entra
+  if(CONFIG.ADMIN_TOKENS.indexOf(token)>=0){isAdmin=true;return true;}
+  // Aluna: verifica se ainda está ativo
+  var tokens=getTokens();
+  var found=tokens.find(function(t){return t.code===token&&t.ativo});
+  return !!found;
+}
+
+/* ============================================================
+   TOUR
+   ============================================================ */
+var tourTextos=[
+  {emoji:'🎂',titulo:'Bem-vinda ao <em>Precifica!</em>',texto:'Aqui você descobre o preço certo dos seus bolos — sem planilha complicada, sem matemática difícil. É tudo simples, do jeitinho que você merece.'},
+  {emoji:'🧮',titulo:'Calcule <em>de verdade</em>',texto:'Coloca os ingredientes com o preço que você pagou no mercado. O app faz toda a conta do custo por grama — tudo automático, sem erro.'},
+  {emoji:'💡',titulo:'Não esqueça os <em>custos fixos</em>',texto:'Energia, gás, embalagem... tudo isso sai do seu bolso! A gente inclui tudo no cálculo pra você não sair no prejuízo sem perceber.'},
+  {emoji:'📋',titulo:'Seu <em>estoque</em> inteligente',texto:'Cadastra seus ingredientes uma vez só. Na hora de criar uma receita nova, é só digitar o nome e já aparece tudo preenchido automaticamente!'},
+  {emoji:'🏆',titulo:'Pronta pra <em>lucrar?</em>',texto:'Você vai ver o preço certo, o lucro por bolo, e quanto vai faturar vendendo o lote todo. Nada de chutar preço — sua confeitaria merece ser lucrativa!'},
+];
+
+function tourNext(){
+  if(tourSlide>=4){fecharTour();return;}
+  tourSlide++;
+  atualizarTourSlide();
+}
+
+function atualizarTourSlide(){
+  var d=tourTextos[tourSlide];
+  var conteudo=document.querySelectorAll('.tour-slide');
+  conteudo.forEach(function(s,i){s.className='tour-slide'+(i===tourSlide?' ativo':'')});
+  var dots=document.querySelectorAll('.tour-dot');
+  dots.forEach(function(dot,i){dot.className='tour-dot'+(i===tourSlide?' ativo':'')});
+  document.getElementById('tour-prog-fill').style.width=((tourSlide+1)/5*100)+'%';
+  document.getElementById('tour-btn').textContent=tourSlide===4?'Começar! 🎉':'Próximo →';
+  // Atualiza conteúdo do slide
+  var s=document.getElementById('ts'+tourSlide);
+  s.querySelector('.tour-emoji').textContent=d.emoji;
+  s.querySelector('.tour-titulo').innerHTML=d.titulo;
+  s.querySelector('.tour-texto').textContent=d.texto.replace(/<[^>]+>/g,'');
+  s.querySelector('.tour-titulo').innerHTML=d.titulo; // com formatação
+}
+
+function fecharTour(){
+  document.getElementById('tour').classList.remove('vis');
+  LSSet('precifica_tour_visto',true);
+}
+
+/* ============================================================
+   NAVEGAÇÃO DE ABAS
+   ============================================================ */
+var stepNomes=['início','nome','ingredientes','custos','resultado'];
+
+function irAba(a){
+  document.querySelectorAll('.aba').forEach(function(x){x.classList.remove('vis')});
+  var el=document.getElementById('aba-'+a);
+  if(el)el.classList.add('vis');
+
+  // Steps bar
+  var stepsBar=document.getElementById('steps-bar');
+  var stepMap={s1:1,s2:2,s3:3,s4:4};
+  if(stepMap[a]!==undefined){
+    stepsBar.style.display='flex';
+    var n=stepMap[a];
+    for(var i=0;i<=4;i++){var d=document.getElementById('d'+i);if(!d)continue;d.className='sdot';if(i<n)d.classList.add('feito');else if(i===n)d.classList.add('ativo');}
+    document.getElementById('slbl').textContent=stepNomes[n]||'';
+  } else {
+    stepsBar.style.display='none';
+  }
+
+  // Bottom nav
+  document.querySelectorAll('.bnav-btn').forEach(function(b){b.classList.remove('ativo')});
+  var navMap={home:'bnav-home',sobre:'bnav-sobre',admin:'bnav-home'};
+  if(navMap[a])document.getElementById(navMap[a]).classList.add('ativo');
+
+  window.scrollTo(0,0);
+}
+
+function irAbaEstoque(){
+  irAba('home');
+  setTimeout(function(){mudarTab('est',document.getElementById('tab-est-btn'));},50);
+}
+
+/* ============================================================
+   HOME TABS
+   ============================================================ */
+function mudarTab(t,btn){
+  document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('ativo')});
+  btn.classList.add('ativo');
+  document.getElementById('tab-hist').style.display=t==='hist'?'block':'none';
+  document.getElementById('tab-est').style.display=t==='est'?'block':'none';
+  document.getElementById('bnav-est').classList.remove('ativo');
+  if(t==='hist'){document.getElementById('bnav-home').classList.add('ativo');}
+  if(t==='est'){document.getElementById('bnav-est').classList.add('ativo');}
+}
+
+/* ============================================================
+   INICIAR CÁLCULO / EDIÇÃO
+   ============================================================ */
+function iniciarCalculo(){
+  editandoId=null;
+  document.getElementById('inp-nome').value='';
+  document.getElementById('inp-rend').value='1';
+  document.getElementById('ing-lista').innerHTML='';
+  ingCount=0;margemAtual=30;
+  document.querySelectorAll('.btn-m').forEach(function(b){b.classList.remove('sel')});
+  document.getElementById('m30').classList.add('sel');
+  document.getElementById('m-custom').value='';
+  irAba('s1');
+  document.getElementById('bnav-calc').classList.add('ativo');
+}
+
+function editarReceita(id){
+  var hist=LSArr('precifica_hist');
+  var r=hist.find(function(h){return h.id===id});
+  if(!r)return;
+  editandoId=id;
+  document.getElementById('inp-nome').value=r.nome;
+  document.getElementById('inp-rend').value=r.rendQtd;
+  document.getElementById('inp-tipo').value=r.rendTipo;
+  document.getElementById('titulo-s2').textContent=r.nome;
+  document.getElementById('ing-lista').innerHTML='';
+  ingCount=0;
+  if(r.ings&&r.ings.length){
+    r.ings.forEach(function(i){addIng(i.nome,i.preco,i.qtdP,i.und,i.qtdU);});
+  } else {addIng();}
+  // Custos
+  ['energia','gas','embalagem','entrega','maodeobra','outros'].forEach(function(k){
+    var el=document.getElementById('c-'+k);
+    if(el)el.value=r[k]||0;
+  });
+  margemAtual=r.margem||30;
+  document.querySelectorAll('.btn-m').forEach(function(b){b.classList.remove('sel')});
+  var bm=document.getElementById('m'+margemAtual);
+  if(bm)bm.classList.add('sel'); else document.getElementById('m-custom').value=margemAtual;
+  irAba('s3');
+}
+
+/* ============================================================
+   STEP 1 VALIDAÇÃO
+   ============================================================ */
+function validarS1(){
+  var nome=document.getElementById('inp-nome').value.trim();
+  if(!nome){alert('Coloque o nome do bolo pra continuar 😊');document.getElementById('inp-nome').focus();return;}
+  document.getElementById('titulo-s2').textContent=nome;
+  if(document.getElementById('ing-lista').children.length===0)addIng();
+  irAba('s2');
+}
+
+/* ============================================================
+   ESTOQUE
+   ============================================================ */
+function getEstoque(){return LSArr('precifica_estoque')}
+function saveEstoque(e){LSSet('precifica_estoque',e)}
+
+function abrirAddEstoque(){
+  document.getElementById('est-nome').value='';
+  document.getElementById('est-preco').value='';
+  document.getElementById('est-qtd').value='';
+  var m=document.getElementById('modal-estoque');
+  m.style.display='flex';
+  setTimeout(function(){document.getElementById('est-nome').focus();},300);
+}
+function fecharModal(){document.getElementById('modal-estoque').style.display='none';}
+
+function salvarEstoque(){
+  var nome=document.getElementById('est-nome').value.trim();
+  if(!nome){alert('Coloque o nome do ingrediente');return;}
+  var preco=parseFloat(document.getElementById('est-preco').value)||0;
+  var qtd=parseFloat(document.getElementById('est-qtd').value)||0;
+  var und=document.getElementById('est-und').value;
+  var est=getEstoque();
+  est.push({id:Date.now(),nome:nome,preco:preco,qtd:qtd,und:und});
+  saveEstoque(est);
+  fecharModal();
+  renderEstoque();
+  if(document.getElementById('tab-est').style.display!=='none'){}
+}
+
+function renderEstoque(){
+  var est=getEstoque();
+  var el=document.getElementById('estoque-lista');
+  if(!el)return;
+  if(!est.length){el.innerHTML='<div class="empty"><span class="ei">🥚</span><p>Nenhum ingrediente no estoque ainda.<br>Adicione os que você usa sempre!</p></div>';return;}
+  el.innerHTML=est.map(function(e){
+    var precoUni=(e.preco>0&&e.qtd>0)?(e.preco/e.qtd):0;
+    return '<div class="estoque-item"><div class="est-info"><div class="est-nome">'+e.nome+'</div><div class="est-detalhe">Pacote: R$'+fmtN(e.preco)+' / '+e.qtd+e.und+' · R$'+fmtN(precoUni)+'/'+e.und+'</div></div><button class="btn-sm danger" onclick="remEstoque('+e.id+')">✕</button></div>';
+  }).join('');
+}
+
+function remEstoque(id){
+  var est=getEstoque().filter(function(e){return e.id!==id});
+  saveEstoque(est);renderEstoque();
+}
+
+function getSugestoes(query){
+  if(!query||query.length<2)return[];
+  var est=getEstoque();
+  return est.filter(function(e){return e.nome.toLowerCase().indexOf(query.toLowerCase())>=0}).slice(0,5);
+}
+
+/* ============================================================
+   INGREDIENTES
+   ============================================================ */
+function addIng(nome,preco,qtdP,und,qtdU){
+  nome=nome||'';preco=preco||'';qtdP=qtdP||'';und=und||'g';qtdU=qtdU||'';
+  var id=ingCount++;
+  var div=document.createElement('div');
+  div.className='ing-row';div.id='ir'+id;
+  var unds=['g','ml','un','kg','l','xíc','col'];
+  var opts=unds.map(function(u){return '<option value="'+u+'"'+(u===und?' selected':'')+'>'+u+'</option>';}).join('');
+  div.innerHTML=
+    '<div class="ing-cabecalho">'+
+      '<div class="campo-wrap" style="flex:1;">'+
+        '<input class="ing-nome-inp" type="text" placeholder="Nome do ingrediente (ex: Farinha de trigo)" value="'+esc(nome)+'" id="in'+id+'" oninput="onIngNome('+id+',this.value)" autocomplete="off">'+
+        '<div class="sugestoes" id="sug'+id+'" style="display:none;"></div>'+
+      '</div>'+
+      '<button class="btn-del" onclick="remIng('+id+')">✕</button>'+
+    '</div>'+
+    '<div class="ing-grid3">'+
+      '<div><span class="mini-lbl">PREÇO DO PACOTE (R$)</span><input class="mini-inp" type="number" id="pp'+id+'" placeholder="0,00" min="0" step="0.01" value="'+preco+'" inputmode="decimal" oninput="calcSub('+id+')"></div>'+
+      '<div><span class="mini-lbl">TAMANHO DO PACOTE</span><input class="mini-inp" type="number" id="pq'+id+'" placeholder="0" min="0" step="1" value="'+qtdP+'" inputmode="decimal" oninput="calcSub('+id+')"></div>'+
+      '<div><span class="mini-lbl">UNIDADE</span><select class="mini-sel" id="pu'+id+'" onchange="calcSub('+id+')">'+opts+'</select></div>'+
+    '</div>'+
+    '<div class="ing-grid2" style="margin-top:8px;">'+
+      '<div><span class="mini-lbl">QUANTO USA NA RECEITA</span><input class="mini-inp" type="number" id="pu2'+id+'" placeholder="0" min="0" step="0.1" value="'+qtdU+'" inputmode="decimal" oninput="calcSub('+id+')" style="text-align:right;width:100%;"></div>'+
+      '<div><span class="mini-lbl">CUSTO DESTA PORÇÃO</span><div class="ing-sub" id="is'+id+'">R$ 0,00</div></div>'+
+    '</div>';
+  document.getElementById('ing-lista').appendChild(div);
+  if(nome)calcSub(id);
+}
+
+function esc(s){return String(s).replace(/"/g,'&quot;')}
+
+function remIng(id){var el=document.getElementById('ir'+id);if(el)el.remove();}
+
+function onIngNome(id,val){
+  var sugs=getSugestoes(val);
+  var box=document.getElementById('sug'+id);
+  if(!box)return;
+  if(!sugs.length){box.style.display='none';return;}
+  box.innerHTML=sugs.map(function(s){
+    return '<div class="sug-item" onclick="selecionarSug('+id+','+s.id+')">'+s.nome+'<small>Pacote: R$'+fmtN(s.preco)+' / '+s.qtd+s.und+'</small></div>';
+  }).join('');
+  box.style.display='block';
+}
+
+function selecionarSug(ingId,estId){
+  var est=getEstoque().find(function(e){return e.id===estId});
+  if(!est)return;
+  var nomeEl=document.getElementById('in'+ingId);
+  if(nomeEl)nomeEl.value=est.nome;
+  var ppEl=document.getElementById('pp'+ingId);
+  if(ppEl)ppEl.value=est.preco;
+  var pqEl=document.getElementById('pq'+ingId);
+  if(pqEl)pqEl.value=est.qtd;
+  var puEl=document.getElementById('pu'+ingId);
+  if(puEl)puEl.value=est.und;
+  var box=document.getElementById('sug'+ingId);
+  if(box)box.style.display='none';
+  calcSub(ingId);
+}
+
+function calcSub(id){
+  var pr=parseFloat((document.getElementById('pp'+id)||{}).value)||0;
+  var qp=parseFloat((document.getElementById('pq'+id)||{}).value)||0;
+  var qu=parseFloat((document.getElementById('pu2'+id)||{}).value)||0;
+  var sub=(pr>0&&qp>0&&qu>0)?(pr/qp)*qu:0;
+  var el=document.getElementById('is'+id);if(el)el.textContent=fmt(sub);
+}
+
+function coletarIngs(){
+  var rows=document.querySelectorAll('.ing-row');
+  var lista=[];
+  rows.forEach(function(row){
+    var id=row.id.replace('ir','');
+    var nEl=document.getElementById('in'+id);
+    var nome=nEl?nEl.value.trim():'';
+    var pr=parseFloat((document.getElementById('pp'+id)||{}).value)||0;
+    var qp=parseFloat((document.getElementById('pq'+id)||{}).value)||0;
+    var und=(document.getElementById('pu'+id)||{}).value||'g';
+    var qu=parseFloat((document.getElementById('pu2'+id)||{}).value)||0;
+    var custo=(pr>0&&qp>0&&qu>0)?(pr/qp)*qu:0;
+    lista.push({nome:nome||'(sem nome)',preco:pr,qtdP:qp,und:und,qtdU:qu,custo:custo});
+  });
+  return lista;
+}
+
+/* ============================================================
+   MARGEM
+   ============================================================ */
+function selM(v,btn){
+  margemAtual=v;
+  document.querySelectorAll('.btn-m').forEach(function(b){b.classList.remove('sel')});
+  btn.classList.add('sel');
+  document.getElementById('m-custom').value='';
+}
+function mCustom(){
+  var v=parseFloat(document.getElementById('m-custom').value);
+  if(v>0){margemAtual=v;document.querySelectorAll('.btn-m').forEach(function(b){b.classList.remove('sel')});}
+}
+
+/* ============================================================
+   CALCULAR
+   ============================================================ */
+function calcular(){
+  var nome=document.getElementById('inp-nome').value.trim()||'Meu Bolo';
+  var rendQtd=parseFloat(document.getElementById('inp-rend').value)||1;
+  var rendTipo=document.getElementById('inp-tipo').value;
+  var ings=coletarIngs();
+  var custoIng=ings.reduce(function(s,i){return s+i.custo;},0);
+
+  var energia=parseFloat(document.getElementById('c-energia').value)||0;
+  var gas=parseFloat(document.getElementById('c-gas').value)||0;
+  var embalagem=parseFloat(document.getElementById('c-embalagem').value)||0;
+  var entrega=parseFloat(document.getElementById('c-entrega').value)||0;
+  var maodeobra=parseFloat(document.getElementById('c-maodeobra').value)||0;
+  var outros=parseFloat(document.getElementById('c-outros').value)||0;
+  var custoFix=energia+gas+embalagem+entrega+maodeobra+outros;
+
+  var customM=parseFloat(document.getElementById('m-custom').value);
+  var margem=(customM>0)?customM:margemAtual;
+
+  var cIU=custoIng/rendQtd;
+  var cFU=custoFix/rendQtd;
+  var cTU=cIU+cFU;
+  var lucroU=cTU*(margem/100);
+  var precoU=cTU+lucroU;
+  var fat=precoU*rendQtd;
+
+  resultadoAtual={
+    id:editandoId||Date.now(),
+    nome:nome,rendQtd:rendQtd,rendTipo:rendTipo,ings:ings,
+    custoIng:custoIng,cIU:cIU,energia:energia,gas:gas,embalagem:embalagem,
+    entrega:entrega,maodeobra:maodeobra,outros:outros,
+    custoFix:custoFix,cFU:cFU,cTU:cTU,margem:margem,lucroU:lucroU,precoU:precoU,fat:fat,
+    data:new Date().toLocaleDateString('pt-BR')
+  };
+
+  mostrarRes(resultadoAtual);
+  irAba('s4');
+}
+
+function mostrarRes(r){
+  var tipos={bolo:'BOLO',fatia:'FATIA',pote:'POTE',unidade:'UNIDADE',kg:'KG'};
+  document.getElementById('r-prod').textContent=r.nome;
+  document.getElementById('r-tipo-lbl').textContent=tipos[r.rendTipo]||'UNIDADE';
+  document.getElementById('r-preco').textContent=fmt(r.precoU);
+  document.getElementById('r-render').textContent=r.rendQtd>1?'Rende '+r.rendQtd+' '+r.rendTipo+'s':'1 '+r.rendTipo;
+
+  var v=document.getElementById('r-verdict');
+  if(r.margem<30){v.className='verdict ruim';v.textContent='⚠️ Margem de '+r.margem+'% — abaixo do mínimo!';}
+  else if(r.margem<50){v.className='verdict av';v.textContent='🟡 Margem de '+r.margem+'% — pode melhorar';}
+  else{v.className='verdict ok';v.textContent='🏆 Margem de '+r.margem+'% — excelente!';}
+
+  document.getElementById('r-c-ing').textContent=fmt(r.cIU);
+  document.getElementById('r-c-fix').textContent=fmt(r.cFU);
+  document.getElementById('r-c-tot').textContent=fmt(r.cTU);
+  document.getElementById('r-lucro').textContent=fmt(r.lucroU);
+  document.getElementById('r-m-lbl').textContent=r.margem+'% de margem';
+  document.getElementById('r-fat').textContent=fmt(r.fat);
+  document.getElementById('r-fat-sub').textContent=r.rendQtd>1?'vendendo '+r.rendQtd+' '+r.rendTipo+'s':'1 '+r.rendTipo;
+
+  var bdH='';
+  r.ings.forEach(function(i){if(i.custo>0||i.nome!=='(sem nome)')bdH+='<div class="bd-row"><span class="bd-nome">'+i.nome+'</span><span class="bd-val">'+fmt(i.custo/r.rendQtd)+'</span></div>';});
+  document.getElementById('bd-ings').innerHTML=bdH||'<div class="bd-row"><span class="bd-nome">Nenhum ingrediente</span><span class="bd-val">—</span></div>';
+  document.getElementById('bd-tot-ing').textContent=fmt(r.cIU);
+  document.getElementById('bd-energia').textContent=fmt(r.energia/r.rendQtd);
+  document.getElementById('bd-gas').textContent=fmt(r.gas/r.rendQtd);
+  document.getElementById('bd-embalagem').textContent=fmt(r.embalagem/r.rendQtd);
+  document.getElementById('bd-entrega').textContent=fmt(r.entrega/r.rendQtd);
+  document.getElementById('bd-maodeobra').textContent=fmt(r.maodeobra/r.rendQtd);
+  document.getElementById('bd-outros').textContent=fmt(r.outros/r.rendQtd);
+  document.getElementById('bd-tot').textContent=fmt(r.cTU);
+  document.getElementById('bd-lucro').textContent='+'+fmt(r.lucroU)+' por '+r.rendTipo;
+
+  var al='';
+  if(r.cTU===0){al='<div class="alerta av"><span class="al-icon">⚠️</span><div><strong>Nenhum custo informado</strong>Adicione ingredientes e custos para um cálculo real.</div></div>';}
+  else if(r.margem<30){al='<div class="alerta ruim"><span class="al-icon">🚨</span><div><strong>Margem muito baixa!</strong>Com menos de 30% você está trabalhando muito pra ganhar pouco. Revise seus preços ou reduza custos.</div></div>';}
+  else if(r.maodeobra===0){al='<div class="alerta av"><span class="al-icon">💡</span><div><strong>Você não incluiu sua mão de obra</strong>Seu tempo vale dinheiro! Volte e adicione o valor do seu trabalho nos custos fixos.</div></div>';}
+  else{al='<div class="alerta ok"><span class="al-icon">🎉</span><div><strong>Cálculo completo!</strong>Com '+r.margem+'% de margem e '+fmt(r.lucroU)+' de lucro por '+r.rendTipo+', você está no caminho certo!</div></div>';}
+  document.getElementById('r-alerta').innerHTML=al;
+}
+
+/* ============================================================
+   SALVAR / HISTÓRICO
+   ============================================================ */
+function salvarENovo(){
+  if(resultadoAtual){
+    var hist=LSArr('precifica_hist');
+    if(editandoId){hist=hist.filter(function(h){return h.id!==editandoId});}
+    hist.unshift(resultadoAtual);
+    if(hist.length>50)hist.pop();
+    LSSet('precifica_hist',hist);
+  }
+  resultadoAtual=null;editandoId=null;
+  irAba('home');renderHist();
+}
+
+function renderHist(){
+  var hist=LSArr('precifica_hist');
+  var el=document.getElementById('hist-lista');if(!el)return;
+  if(!hist.length){el.innerHTML='<div class="empty"><span class="ei">📭</span><p>Nenhuma receita salva ainda.<br>Calcule o preço do seu primeiro bolo!</p></div>';return;}
+  el.innerHTML=hist.map(function(h){
+    return '<div class="hist-card">'+
+      '<div class="hist-topo"><div><div class="hist-nome">'+h.nome+'</div><div class="hist-data">'+h.data+' · '+h.rendQtd+' '+h.rendTipo+(h.rendQtd>1?'s':'')+'</div></div>'+
+      '<div class="hist-preco">'+fmt(h.precoU)+'</div></div>'+
+      '<div class="hist-tags">'+
+        '<span class="htag r">Custo '+fmt(h.cTU)+'</span>'+
+        '<span class="htag v">Lucro '+fmt(h.lucroU)+'</span>'+
+        '<span class="htag a">'+h.margem+'% margem</span>'+
+      '</div>'+
+      '<div class="hist-actions">'+
+        '<button class="btn-sm" onclick="editarReceita('+h.id+')">✏️ Editar</button>'+
+        '<button class="btn-sm danger" onclick="excluirHist('+h.id+')">🗑 Excluir</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function excluirHist(id){
+  if(!confirm('Excluir esta receita?'))return;
+  var hist=LSArr('precifica_hist').filter(function(h){return h.id!==id});
+  LSSet('precifica_hist',hist);renderHist();
+}
+
+/* ============================================================
+   COMPARTILHAR
+   ============================================================ */
+function compartilhar(){
+  if(!resultadoAtual)return;
+  var r=resultadoAtual;
+  var txt='🎂 '+r.nome+'\n💰 Preço: '+fmt(r.precoU)+' por '+r.rendTipo+'\n📊 Custo total: '+fmt(r.cTU)+'\n🏆 Lucro: '+fmt(r.lucroU)+' ('+r.margem+'% de margem)\n📦 Faturamento do lote: '+fmt(r.fat)+'\n\nCalculado pelo Precifica — Delícia em Bolo 🍰\n@deliciaembolodani';
+  if(navigator.share){navigator.share({title:'Precificação: '+r.nome,text:txt}).catch(function(){});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(txt).then(function(){alert('✅ Copiado! Cole no WhatsApp ou Instagram.');}).catch(function(){alert(txt);});}
+  else{alert(txt);}
+}
+
+/* ============================================================
+   ADMIN PANEL
+   ============================================================ */
+function abrirAdmin(){irAba('admin');renderTokens();}
+
+function gerarToken(){
+  var nomeAluna=document.getElementById('adm-nome-aluna').value.trim();
+  if(!nomeAluna){alert('Coloque o nome da aluna primeiro');return;}
+  var tokens=getTokens();
+  var num=tokens.filter(function(t){return !t.isAdmin}).length+1;
+  var numStr=String(num).padStart(3,'0');
+  var sufixo=Math.random().toString(36).substring(2,5).toUpperCase();
+  var code=numStr+'-'+sufixo;
+  var link=CONFIG.APP_URL+'?t='+code;
+  tokens.push({code:code,nome:nomeAluna,num:num,ativo:true,criado:new Date().toLocaleDateString('pt-BR'),link:link});
+  saveTokens(tokens);
+  document.getElementById('adm-token-code').textContent=code;
+  document.getElementById('adm-token-link').textContent=link;
+  document.getElementById('adm-token-gerado').style.display='block';
+  document.getElementById('adm-nome-aluna').value='';
+  renderTokens();
+}
+
+function copiarToken(){
+  var link=document.getElementById('adm-token-link').textContent;
+  var code=document.getElementById('adm-token-code').textContent;
+  var txt='Olá! Aqui está seu acesso exclusivo ao Precifica by Daniella 🎂\n\nCódigo de acesso: '+code+'\nLink direto: '+link+'\n\nGuarda esse código, tá? Ele é só seu! ❤️';
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(function(){alert('✅ Link de acesso copiado! Envie para a aluna pelo WhatsApp.');});}
+  else{alert(txt);}
+}
+
+function renderTokens(){
+  var tokens=getTokens();
+  var el=document.getElementById('adm-tokens-lista');if(!el)return;
+  if(!tokens.length){el.innerHTML='<div class="empty"><span class="ei">🔑</span><p>Nenhum acesso gerado ainda.</p></div>';return;}
+  el.innerHTML=tokens.map(function(t){
+    return '<div class="token-item">'+
+      '<div class="token-num">#'+String(t.num).padStart(3,'0')+'</div>'+
+      '<div class="token-info">'+
+        '<div class="token-code">'+t.code+'</div>'+
+        '<div class="token-nome">'+t.nome+'</div>'+
+        '<div class="token-data">Criado em '+t.criado+'</div>'+
+      '</div>'+
+      '<span class="token-badge '+(t.ativo?'ativo':'revogado')+'">'+(t.ativo?'ATIVO':'REVOGADO')+'</span>'+
+      '<button class="btn-sm '+(t.ativo?'danger':'')+'" onclick="toggleToken(\''+t.code+'\')">'+(t.ativo?'Revogar':'Reativar')+'</button>'+
+    '</div>';
+  }).join('');
+}
+
+function toggleToken(code){
+  var tokens=getTokens();
+  var t=tokens.find(function(x){return x.code===code});
+  if(t)t.ativo=!t.ativo;
+  saveTokens(tokens);renderTokens();
+}
+
+/* ============================================================
+   UTIL
+   ============================================================ */
+function fmt(v){if(!v||isNaN(v))v=0;return 'R$ '+v.toFixed(2).replace('.',',');}
+function fmtN(v){if(!v||isNaN(v))v=0;return v.toFixed(2).replace('.',',');}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+(function init(){
+  // Verificar token na URL
+  var params=new URLSearchParams(window.location.search);
+  var urlToken=params.get('t');
+  if(urlToken){
+    urlToken=urlToken.toUpperCase();
+    // Admin
+    if(CONFIG.ADMIN_TOKENS.indexOf(urlToken)>=0){
+      LSSet('precifica_token_atual',urlToken);LSSet('precifica_is_admin',true);
+    } else {
+      // Aluna
+      var tokens=getTokens();
+      var found=tokens.find(function(t){return t.code===urlToken&&t.ativo});
+      if(found){LSSet('precifica_token_atual',urlToken);LSSet('precifica_is_admin',false);}
+    }
+    // Limpar token da URL
+    window.history.replaceState({},'',window.location.pathname);
+  }
+
+  // Verificar sessão existente
+  if(verificarSessao()){
+    isAdmin=!!(LS('precifica_is_admin'));
+    entrar();
+  }
+  // Senão mostra tela de acesso (já visível por padrão)
+})();
+</script>
+</body>
+</html>
